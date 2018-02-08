@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/empijei/cli/lg"
@@ -31,17 +32,28 @@ func Init() {
 			os.Args = os.Args[:1]
 		}
 		command, err := FindCommand(directive)
-		if err == nil {
-			callCommand(command)
-		} else {
-			lg.Error(err.Error())
-			lg.Error("Available commands are:\n")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			fmt.Fprintln(os.Stderr, "Available commands are:\n")
 			for _, cmd := range Commands {
-				lg.Error("\t" + cmd.Name + "\n\t\t" + cmd.Short)
+				fmt.Fprintln(os.Stderr, "\t"+cmd.Name+"\n\t\t"+cmd.Short)
 			}
-			lg.Error("\nDefault command is: ", DefaultCommand.Name)
+			fmt.Fprintln(os.Stderr, "\nDefault command is: "+DefaultCommand.Name)
+			return
 		}
-	} else {
-		callCommand(DefaultCommand)
+		if command == nil {
+			if DefaultCommand != nil {
+				callCommand(DefaultCommand)
+				return
+			}
+			lg.Error("Command not found, default not specified")
+			return
+		}
+		callCommand(command)
 	}
+	if DefaultCommand != nil {
+		callCommand(DefaultCommand)
+		return
+	}
+	lg.Error("No command specified, default not configured")
 }
