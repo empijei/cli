@@ -51,7 +51,7 @@ func (c *Cmd) Usage() {
 
 // FindCommand takes a string and searches for a command whose name has that string as
 // prefix. If more than 1 command name has that string as a prefix (and no command name
-// equals that string), an error is returned. If no suitable command is found, an error
+// equals that string), an error is returned. If no suitable command is found, nil
 // is returned.
 func FindCommand(name string) (command *Cmd, err error) {
 	for _, cmd := range Commands {
@@ -69,9 +69,6 @@ func FindCommand(name string) (command *Cmd, err error) {
 				command = cmd
 			}
 		}
-	}
-	if command == nil {
-		err = fmt.Errorf("Command not found: '%s'.", name)
 	}
 	return
 }
