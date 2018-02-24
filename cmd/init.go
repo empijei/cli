@@ -11,8 +11,7 @@ import (
 var Printbanner func()
 
 func Init() {
-	stderrinfo, err := os.Stderr.Stat()
-	if err == nil && stderrinfo.Mode()&os.ModeCharDevice == 0 {
+	if IsPiped() {
 		// Output is a pipe, turn off colors
 		lg.Color = false
 	} else {
@@ -65,4 +64,12 @@ func Init() {
 		os.Args = os.Args[:1]
 	}
 	callCommand(command)
+}
+
+func IsPiped() bool {
+	stderrinfo, err := os.Stderr.Stat()
+	if err == nil && stderrinfo.Mode()&os.ModeCharDevice == 0 {
+		return true
+	}
+	return false
 }
